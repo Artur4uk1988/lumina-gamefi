@@ -1,0 +1,986 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LUMINA — Mobile UI</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --bg: #06080f;
+    --surface: #0d1220;
+    --surface2: #111827;
+    --border: rgba(120, 200, 255, 0.08);
+    --accent: #7ecfff;
+    --accent2: #4af0b0;
+    --accent3: #f0c44a;
+    --danger: #ff4f6a;
+    --text: #e8f4ff;
+    --text-dim: #5a7a99;
+    --text-mid: #8ab0cc;
+    --glow: rgba(126, 207, 255, 0.15);
+  }
+
+  body {
+    background: #03050a;
+    display: flex;
+    justify-content: center;
+    align-items: flex-start;
+    min-height: 100vh;
+    padding: 40px 20px;
+    font-family: 'DM Mono', monospace;
+    gap: 40px;
+    flex-wrap: wrap;
+  }
+
+  .phone {
+    width: 375px;
+    background: var(--bg);
+    border-radius: 44px;
+    border: 1.5px solid rgba(126,207,255,0.18);
+    overflow: hidden;
+    box-shadow:
+      0 0 0 6px rgba(0,0,0,0.6),
+      0 0 80px rgba(126,207,255,0.08),
+      0 40px 100px rgba(0,0,0,0.8);
+    position: relative;
+  }
+
+  .phone-label {
+    color: rgba(126,207,255,0.3);
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    text-align: center;
+    margin-bottom: 12px;
+  }
+
+  /* STATUS BAR */
+  .statusbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 24px 0;
+    font-size: 11px;
+    color: var(--text-mid);
+    letter-spacing: 0.5px;
+  }
+  .statusbar .time { font-weight: 500; font-size: 13px; color: var(--text); }
+  .statusbar-right { display: flex; gap: 6px; align-items: center; }
+  .signal-bar { width: 3px; background: var(--accent); border-radius: 1px; }
+
+  /* SCREEN CONTENT */
+  .screen { padding: 16px 20px 32px; }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .logo {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+    color: var(--text);
+  }
+  .logo span {
+    color: var(--accent);
+    text-shadow: 0 0 20px var(--accent);
+  }
+  .avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    border: 1.5px solid var(--accent);
+    background: linear-gradient(135deg, #1a2a3a, #0d1a2a);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 14px;
+    box-shadow: 0 0 12px rgba(126,207,255,0.2);
+  }
+
+  /* STABILITY CARD */
+  .stability-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 18px;
+    margin-bottom: 14px;
+    position: relative;
+    overflow: hidden;
+  }
+  .stability-card::before {
+    content: '';
+    position: absolute;
+    top: -40px; right: -40px;
+    width: 120px; height: 120px;
+    background: radial-gradient(circle, rgba(126,207,255,0.08) 0%, transparent 70%);
+    border-radius: 50%;
+  }
+  .card-label {
+    font-size: 9px;
+    letter-spacing: 2.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 10px;
+  }
+  .stability-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 42px;
+    font-weight: 800;
+    color: var(--accent2);
+    line-height: 1;
+    text-shadow: 0 0 30px rgba(74,240,176,0.4);
+    margin-bottom: 6px;
+  }
+  .stability-sub {
+    font-size: 10px;
+    color: var(--text-dim);
+    margin-bottom: 14px;
+  }
+  .progress-track {
+    background: rgba(255,255,255,0.05);
+    border-radius: 4px;
+    height: 6px;
+    overflow: hidden;
+    margin-bottom: 4px;
+  }
+  .progress-fill {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--accent2), var(--accent));
+    box-shadow: 0 0 10px rgba(74,240,176,0.5);
+    transition: width 1s ease;
+  }
+  .progress-labels {
+    display: flex;
+    justify-content: space-between;
+    font-size: 9px;
+    color: var(--text-dim);
+  }
+
+  /* STATS ROW */
+  .stats-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .stat-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 12px 10px;
+    text-align: center;
+  }
+  .stat-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .stat-value.accent { color: var(--accent); }
+  .stat-value.green { color: var(--accent2); }
+  .stat-value.yellow { color: var(--accent3); }
+  .stat-label {
+    font-size: 8px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+  }
+
+  /* NETWORK VISUAL */
+  .network-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .network-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 14px;
+  }
+  .network-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .badge {
+    font-size: 9px;
+    letter-spacing: 1px;
+    padding: 3px 8px;
+    border-radius: 20px;
+    font-weight: 500;
+  }
+  .badge.green { background: rgba(74,240,176,0.1); color: var(--accent2); border: 1px solid rgba(74,240,176,0.2); }
+  .badge.red { background: rgba(255,79,106,0.1); color: var(--danger); border: 1px solid rgba(255,79,106,0.2); }
+  .badge.yellow { background: rgba(240,196,74,0.1); color: var(--accent3); border: 1px solid rgba(240,196,74,0.2); }
+
+  /* SVG NETWORK */
+  .network-svg {
+    width: 100%;
+    height: 130px;
+  }
+
+  /* CONSUMERS LIST */
+  .consumers-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    padding: 16px;
+    margin-bottom: 14px;
+  }
+  .consumer-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .consumer-item:last-child { border-bottom: none; }
+  .consumer-dot {
+    width: 8px; height: 8px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+  .consumer-dot.online { background: var(--accent2); box-shadow: 0 0 6px var(--accent2); }
+  .consumer-dot.offline { background: var(--text-dim); }
+  .consumer-dot.danger { background: var(--danger); box-shadow: 0 0 6px var(--danger); animation: pulse 1.5s infinite; }
+  .consumer-info { flex: 1; }
+  .consumer-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 1px;
+  }
+  .consumer-meta { font-size: 9px; color: var(--text-dim); }
+  .consumer-load {
+    font-size: 11px;
+    color: var(--text-mid);
+    font-weight: 500;
+  }
+
+  /* ALERTS */
+  .alert {
+    border-radius: 14px;
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    border: 1px solid;
+  }
+  .alert.danger {
+    background: rgba(255,79,106,0.06);
+    border-color: rgba(255,79,106,0.2);
+  }
+  .alert.warning {
+    background: rgba(240,196,74,0.06);
+    border-color: rgba(240,196,74,0.2);
+  }
+  .alert-icon { font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+  .alert-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .alert.danger .alert-title { color: var(--danger); }
+  .alert.warning .alert-title { color: var(--accent3); }
+  .alert-text { font-size: 10px; color: var(--text-dim); line-height: 1.5; }
+  .alert-time { font-size: 9px; color: var(--text-dim); margin-top: 4px; }
+
+  /* BOTTOM NAV */
+  .bottom-nav {
+    display: flex;
+    justify-content: space-around;
+    padding: 12px 20px 16px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+    margin-top: 8px;
+  }
+  .nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    opacity: 0.4;
+    transition: opacity 0.2s;
+  }
+  .nav-item.active { opacity: 1; }
+  .nav-icon { font-size: 18px; }
+  .nav-label {
+    font-size: 8px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    color: var(--text-mid);
+  }
+  .nav-item.active .nav-label { color: var(--accent); }
+
+  /* WATT EARN TICKER */
+  .earn-ticker {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: rgba(126,207,255,0.05);
+    border: 1px solid rgba(126,207,255,0.12);
+    border-radius: 12px;
+    padding: 10px 14px;
+    margin-bottom: 14px;
+  }
+  .earn-left { display: flex; align-items: center; gap: 8px; }
+  .earn-icon { font-size: 16px; }
+  .earn-label { font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 1px; }
+  .earn-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+  .earn-rate { font-size: 10px; color: var(--accent2); }
+
+  /* ACTION BUTTONS */
+  .actions-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+    margin-bottom: 14px;
+  }
+  .btn {
+    border-radius: 14px;
+    padding: 13px;
+    font-family: 'Syne', sans-serif;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .btn-primary {
+    background: linear-gradient(135deg, rgba(126,207,255,0.2), rgba(74,240,176,0.15));
+    border: 1px solid rgba(126,207,255,0.3);
+    color: var(--accent);
+  }
+  .btn-danger {
+    background: rgba(255,79,106,0.1);
+    border: 1px solid rgba(255,79,106,0.25);
+    color: var(--danger);
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  @keyframes flicker {
+    0%, 100% { opacity: 1; }
+    92% { opacity: 1; }
+    93% { opacity: 0.4; }
+    94% { opacity: 1; }
+    97% { opacity: 0.6; }
+    98% { opacity: 1; }
+  }
+
+  .glow-text { animation: flicker 4s infinite; }
+
+  /* SCREEN 2 - RAID SCREEN */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text-dim);
+    margin-bottom: 12px;
+  }
+
+  .raid-target {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 16px;
+    padding: 14px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .target-icon {
+    width: 40px; height: 40px;
+    border-radius: 10px;
+    background: linear-gradient(135deg, #1a1a2e, #16213e);
+    border: 1px solid var(--border);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+  .target-info { flex: 1; }
+  .target-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--text);
+    margin-bottom: 2px;
+  }
+  .target-meta { font-size: 9px; color: var(--text-dim); }
+  .target-stability {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  /* WATT BALANCE TOP */
+  .watt-balance {
+    background: linear-gradient(135deg, rgba(126,207,255,0.08), rgba(74,240,176,0.05));
+    border: 1px solid rgba(126,207,255,0.15);
+    border-radius: 16px;
+    padding: 14px 16px;
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .balance-amount {
+    font-family: 'Syne', sans-serif;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--text);
+  }
+  .balance-amount span { color: var(--accent); }
+  .balance-label { font-size: 9px; color: var(--text-dim); letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 3px; }
+  .balance-change { font-size: 11px; color: var(--accent2); }
+</style>
+</head>
+<body>
+
+<!-- PHONE 1: MAIN DASHBOARD -->
+<div>
+  <div class="phone-label">DASHBOARD</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span class="time">21:47</span>
+      <div class="statusbar-right">
+        <div style="display:flex;gap:2px;align-items:flex-end">
+          <div class="signal-bar" style="height:4px;opacity:0.4"></div>
+          <div class="signal-bar" style="height:6px;opacity:0.6"></div>
+          <div class="signal-bar" style="height:8px;opacity:0.8"></div>
+          <div class="signal-bar" style="height:10px"></div>
+        </div>
+        <span style="font-size:11px">⚡ 78%</span>
+      </div>
+    </div>
+
+    <div class="screen">
+      <!-- HEADER -->
+      <div class="header">
+        <div class="logo"><span>LUM</span>INA</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:10px;color:var(--accent2);background:rgba(74,240,176,0.08);border:1px solid rgba(74,240,176,0.2);padding:3px 8px;border-radius:20px">OPERATOR</div>
+          <div class="avatar">⚡</div>
+        </div>
+      </div>
+
+      <!-- WATT BALANCE -->
+      <div class="watt-balance">
+        <div>
+          <div class="balance-label">$WATT Balance</div>
+          <div class="balance-amount">66,<span>150</span></div>
+          <div class="balance-change">+2,847 / час ↑</div>
+        </div>
+        <div style="text-align:right">
+          <div class="balance-label">Репутация</div>
+          <div style="font-family:'Syne',sans-serif;font-size:22px;font-weight:800;color:var(--accent3)">847</div>
+          <div style="font-size:9px;color:var(--text-dim)">TOP 12%</div>
+        </div>
+      </div>
+
+      <!-- STABILITY -->
+      <div class="stability-card">
+        <div class="card-label">Стабильность сети</div>
+        <div class="stability-value glow-text">85%</div>
+        <div class="stability-sub">Нагрузка: 340 / 400 кВт · Норма</div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:85%"></div>
+        </div>
+        <div class="progress-labels">
+          <span>Кризис</span>
+          <span>Норма</span>
+          <span>Идеал</span>
+        </div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value accent">12</div>
+          <div class="stat-label">Потреб.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value green">×1.35</div>
+          <div class="stat-label">Репут.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value yellow">24.5</div>
+          <div class="stat-label">Вес</div>
+        </div>
+      </div>
+
+      <!-- NETWORK SVG -->
+      <div class="network-card">
+        <div class="network-header">
+          <div class="network-title">Топология сети</div>
+          <div class="badge green">LIVE</div>
+        </div>
+        <svg class="network-svg" viewBox="0 0 335 130">
+          <defs>
+            <radialGradient id="nodeGlow" cx="50%" cy="50%" r="50%">
+              <stop offset="0%" style="stop-color:rgba(126,207,255,0.4)"/>
+              <stop offset="100%" style="stop-color:transparent"/>
+            </radialGradient>
+            <filter id="glow">
+              <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
+              <feMerge><feMergeNode in="coloredBlur"/><feMergeNode in="SourceGraphic"/></feMerge>
+            </filter>
+          </defs>
+
+          <!-- Lines -->
+          <line x1="168" y1="40" x2="80" y2="90" stroke="rgba(126,207,255,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="168" y1="40" x2="168" y2="95" stroke="rgba(74,240,176,0.4)" stroke-width="2"/>
+          <line x1="168" y1="40" x2="255" y2="90" stroke="rgba(126,207,255,0.25)" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <line x1="168" y1="40" x2="40" y2="60" stroke="rgba(255,79,106,0.3)" stroke-width="1.5" stroke-dasharray="3,2"/>
+          <line x1="168" y1="40" x2="295" y2="55" stroke="rgba(126,207,255,0.2)" stroke-width="1" stroke-dasharray="4,3"/>
+          <line x1="80" y1="90" x2="40" y2="115" stroke="rgba(126,207,255,0.15)" stroke-width="1"/>
+          <line x1="255" y1="90" x2="295" y2="115" stroke="rgba(126,207,255,0.15)" stroke-width="1"/>
+
+          <!-- Animated flow on main line -->
+          <circle r="3" fill="var(--accent2)" filter="url(#glow)" opacity="0.8">
+            <animateMotion dur="2s" repeatCount="indefinite">
+              <mpath href="#mainLine"/>
+            </animateMotion>
+          </circle>
+          <path id="mainLine" d="M168,40 L168,95" fill="none"/>
+
+          <!-- Central node (Operator) -->
+          <circle cx="168" cy="40" r="16" fill="url(#nodeGlow)"/>
+          <circle cx="168" cy="40" r="10" fill="rgba(126,207,255,0.15)" stroke="var(--accent)" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="168" y="44" text-anchor="middle" font-size="9" fill="var(--accent)" font-family="Syne">⚡</text>
+
+          <!-- Consumer nodes -->
+          <circle cx="168" cy="95" r="7" fill="rgba(74,240,176,0.1)" stroke="var(--accent2)" stroke-width="1.5" filter="url(#glow)"/>
+          <text x="168" y="112" text-anchor="middle" font-size="7" fill="var(--text-dim)" font-family="DM Mono">NODE_04</text>
+
+          <circle cx="80" cy="90" r="7" fill="rgba(126,207,255,0.1)" stroke="var(--accent)" stroke-width="1" opacity="0.7"/>
+          <text x="80" y="107" text-anchor="middle" font-size="7" fill="var(--text-dim)" font-family="DM Mono">NODE_02</text>
+
+          <circle cx="255" cy="90" r="7" fill="rgba(126,207,255,0.1)" stroke="var(--accent)" stroke-width="1" opacity="0.7"/>
+          <text x="255" y="107" text-anchor="middle" font-size="7" fill="var(--text-dim)" font-family="DM Mono">NODE_07</text>
+
+          <!-- Danger node -->
+          <circle cx="40" cy="60" r="6" fill="rgba(255,79,106,0.1)" stroke="var(--danger)" stroke-width="1.5">
+            <animate attributeName="opacity" values="1;0.4;1" dur="1.5s" repeatCount="indefinite"/>
+          </circle>
+          <text x="40" y="77" text-anchor="middle" font-size="7" fill="var(--danger)" font-family="DM Mono">SURGE!</text>
+
+          <!-- Dim node -->
+          <circle cx="295" cy="55" r="5" fill="rgba(90,122,153,0.1)" stroke="var(--text-dim)" stroke-width="1" opacity="0.5"/>
+          <text x="295" y="72" text-anchor="middle" font-size="7" fill="var(--text-dim)" font-family="DM Mono">NODE_11</text>
+
+          <!-- Leaf nodes -->
+          <circle cx="40" cy="115" r="4" fill="rgba(126,207,255,0.08)" stroke="var(--text-dim)" stroke-width="1" opacity="0.4"/>
+          <circle cx="295" cy="115" r="4" fill="rgba(126,207,255,0.08)" stroke="var(--text-dim)" stroke-width="1" opacity="0.4"/>
+        </svg>
+      </div>
+
+      <!-- ALERTS -->
+      <div class="alert danger">
+        <div class="alert-icon">⚠</div>
+        <div>
+          <div class="alert-title">SURGE DETECTED — NODE_01</div>
+          <div class="alert-text">Входящая перегрузка. Нагрузка +85 кВт. Предохранитель активирован. Осталось 4:32</div>
+          <div class="alert-time">2 мин назад</div>
+        </div>
+      </div>
+
+      <div class="alert warning">
+        <div class="alert-icon">⚡</div>
+        <div>
+          <div class="alert-title">НАГРУЗКА 85% — ОСТОРОЖНО</div>
+          <div class="alert-text">Подключение нового потребителя может снизить стабильность</div>
+          <div class="alert-time">сейчас</div>
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="actions-row">
+        <button class="btn btn-primary">⚡ Апгрейд</button>
+        <button class="btn btn-danger">🔴 Lockdown</button>
+      </div>
+    </div>
+
+    <!-- BOTTOM NAV -->
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-label">Сеть</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👥</div>
+        <div class="nav-label">Игроки</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">⚔️</div>
+        <div class="nav-label">Рейды</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📊</div>
+        <div class="nav-label">Рынок</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👤</div>
+        <div class="nav-label">Профиль</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE 2: RAID SCREEN -->
+<div>
+  <div class="phone-label">RAID SCREEN</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span class="time">21:47</span>
+      <div class="statusbar-right">
+        <span style="font-size:11px;color:var(--danger)">⚔ БОЕВОЙ РЕЖИМ</span>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="header">
+        <div style="display:flex;align-items:center;gap:8px">
+          <div style="font-size:18px;color:var(--danger)">⚔</div>
+          <div style="font-family:'Syne',sans-serif;font-size:18px;font-weight:800;color:var(--text)">РЕЙД</div>
+        </div>
+        <div style="font-size:10px;color:var(--text-dim);background:var(--surface);border:1px solid var(--border);padding:4px 10px;border-radius:20px">
+          КД: 3ч 22м
+        </div>
+      </div>
+
+      <!-- WATT TO SPEND -->
+      <div class="watt-balance">
+        <div>
+          <div class="balance-label">Доступно для атаки</div>
+          <div class="balance-amount">12,<span>400</span> $WATT</div>
+        </div>
+        <div style="text-align:right">
+          <div class="balance-label">Сила атаки</div>
+          <div style="font-family:'Syne',sans-serif;font-size:20px;font-weight:800;color:var(--danger)">×2.4</div>
+        </div>
+      </div>
+
+      <!-- ATTACK TYPES -->
+      <div class="section-title">Тип атаки</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-bottom:16px">
+        <div style="background:rgba(255,79,106,0.12);border:1.5px solid rgba(255,79,106,0.4);border-radius:14px;padding:12px 8px;text-align:center">
+          <div style="font-size:20px;margin-bottom:4px">⚡</div>
+          <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--danger)">SURGE</div>
+          <div style="font-size:8px;color:var(--text-dim);margin-top:2px">−3,000 ₩</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;opacity:0.6">
+          <div style="font-size:20px;margin-bottom:4px">🔌</div>
+          <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--text-mid)">BLACKOUT</div>
+          <div style="font-size:8px;color:var(--text-dim);margin-top:2px">−1,500 ₩</div>
+        </div>
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:12px 8px;text-align:center;opacity:0.6">
+          <div style="font-size:20px;margin-bottom:4px">📡</div>
+          <div style="font-family:'Syne',sans-serif;font-size:10px;font-weight:700;color:var(--text-mid)">ПОМЕХИ</div>
+          <div style="font-size:8px;color:var(--text-dim);margin-top:2px">−800 ₩</div>
+        </div>
+      </div>
+
+      <!-- TARGETS -->
+      <div class="section-title">Цели в зоне досягаемости</div>
+
+      <div class="raid-target">
+        <div class="target-icon">🏭</div>
+        <div class="target-info">
+          <div class="target-name">NEXUS_GRID</div>
+          <div class="target-meta">Оператор · Репутация 612 · 8 потреб.</div>
+          <div style="margin-top:5px">
+            <div class="progress-track" style="width:120px">
+              <div class="progress-fill" style="width:72%;background:linear-gradient(90deg,#f0c44a,#ff4f6a)"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:var(--text-dim);margin-bottom:2px;text-align:right">STABILITY</div>
+          <div class="target-stability" style="color:var(--accent3)">72%</div>
+          <div style="font-size:8px;color:var(--text-dim);margin-top:2px">шанс: 68%</div>
+        </div>
+      </div>
+
+      <div class="raid-target" style="opacity:0.5">
+        <div class="target-icon">🏗</div>
+        <div class="target-info">
+          <div class="target-name">DARKPOWER</div>
+          <div class="target-meta">Оператор · Репутация 891 · 15 потреб.</div>
+          <div style="margin-top:5px">
+            <div class="progress-track" style="width:120px">
+              <div class="progress-fill" style="width:91%"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:var(--text-dim);margin-bottom:2px;text-align:right">STABILITY</div>
+          <div class="target-stability" style="color:var(--accent2)">91%</div>
+          <div style="font-size:8px;color:var(--text-dim);margin-top:2px">шанс: 31%</div>
+        </div>
+      </div>
+
+      <div class="raid-target">
+        <div class="target-icon">⚡</div>
+        <div class="target-info">
+          <div class="target-name">VOLT_CORP</div>
+          <div class="target-meta">Оператор · Репутация 445 · 5 потреб.</div>
+          <div style="margin-top:5px">
+            <div class="progress-track" style="width:120px">
+              <div class="progress-fill" style="width:54%;background:linear-gradient(90deg,#ff4f6a,#ff4f6a)"></div>
+            </div>
+          </div>
+        </div>
+        <div>
+          <div style="font-size:8px;color:var(--text-dim);margin-bottom:2px;text-align:right">STABILITY</div>
+          <div class="target-stability" style="color:var(--danger)">54%</div>
+          <div style="font-size:8px;color:var(--danger);margin-top:2px">шанс: 84%</div>
+        </div>
+      </div>
+
+      <!-- REPUTATION WARNING -->
+      <div class="alert warning" style="margin-top:4px">
+        <div class="alert-icon">⚠</div>
+        <div>
+          <div class="alert-title">АТАКА СЛАБОГО = −50 РЕПУТАЦИИ</div>
+          <div class="alert-text">VOLT_CORP значительно слабее тебя. Атака ударит по твоей репутации</div>
+        </div>
+      </div>
+
+      <!-- ATTACK BUTTON -->
+      <button style="width:100%;margin-top:10px;padding:16px;background:linear-gradient(135deg,rgba(255,79,106,0.2),rgba(255,79,106,0.1));border:1.5px solid rgba(255,79,106,0.4);border-radius:14px;font-family:'Syne',sans-serif;font-size:14px;font-weight:800;color:var(--danger);letter-spacing:1px;cursor:pointer">
+        ⚡ SURGE → NEXUS_GRID
+      </button>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-label">Сеть</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👥</div>
+        <div class="nav-label">Игроки</div>
+      </div>
+      <div class="nav-item active">
+        <div class="nav-icon">⚔️</div>
+        <div class="nav-label">Рейды</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📊</div>
+        <div class="nav-label">Рынок</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👤</div>
+        <div class="nav-label">Профиль</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PHONE 3: CONSUMER VIEW -->
+<div>
+  <div class="phone-label">CONSUMER VIEW</div>
+  <div class="phone">
+    <div class="statusbar">
+      <span class="time">21:47</span>
+      <div class="statusbar-right">
+        <span style="font-size:11px">⚡ 91%</span>
+      </div>
+    </div>
+
+    <div class="screen">
+      <div class="header">
+        <div class="logo"><span>LUM</span>INA</div>
+        <div style="display:flex;gap:8px;align-items:center">
+          <div style="font-size:10px;color:var(--accent3);background:rgba(240,196,74,0.08);border:1px solid rgba(240,196,74,0.2);padding:3px 8px;border-radius:20px">CONSUMER</div>
+          <div class="avatar">🔌</div>
+        </div>
+      </div>
+
+      <!-- MY CONNECTION -->
+      <div class="stability-card">
+        <div class="card-label">Мой оператор</div>
+        <div style="display:flex;align-items:center;gap:10px;margin-bottom:12px">
+          <div style="width:40px;height:40px;border-radius:10px;background:rgba(126,207,255,0.08);border:1px solid rgba(126,207,255,0.2);display:flex;align-items:center;justify-content:center;font-size:18px">⚡</div>
+          <div>
+            <div style="font-family:'Syne',sans-serif;font-size:14px;font-weight:700;color:var(--text)">LUMINOS_OP</div>
+            <div style="font-size:9px;color:var(--accent2)">● Подключён · Стабильность 85%</div>
+          </div>
+          <div style="margin-left:auto;text-align:right">
+            <div style="font-size:9px;color:var(--text-dim)">Репутация</div>
+            <div style="font-family:'Syne',sans-serif;font-size:16px;font-weight:700;color:var(--accent3)">847</div>
+          </div>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:85%"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:4px">
+          <span style="font-size:9px;color:var(--text-dim)">Абонплата: 150 $WATT/час</span>
+          <span style="font-size:9px;color:var(--accent2)">Вы в безопасности</span>
+        </div>
+      </div>
+
+      <!-- MY EARNINGS -->
+      <div class="earn-ticker">
+        <div class="earn-left">
+          <div class="earn-icon">⚡</div>
+          <div>
+            <div class="earn-label">Мой доход</div>
+            <div class="earn-value">8,240 $WATT</div>
+          </div>
+        </div>
+        <div class="earn-rate">+340 / час</div>
+      </div>
+
+      <!-- STATS -->
+      <div class="stats-row">
+        <div class="stat-card">
+          <div class="stat-value green">Tir 2</div>
+          <div class="stat-label">Оборуд.</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value yellow">312</div>
+          <div class="stat-label">Репутация</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-value accent">8.4</div>
+          <div class="stat-label">Вес</div>
+        </div>
+      </div>
+
+      <!-- UPGRADE PATH -->
+      <div class="network-card">
+        <div class="network-header">
+          <div class="network-title">Путь развития</div>
+          <div class="badge yellow">PROSUMER →</div>
+        </div>
+
+        <div style="position:relative;padding:8px 0">
+          <!-- Timeline line -->
+          <div style="position:absolute;left:16px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--accent2),rgba(126,207,255,0.3));border-radius:2px"></div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(74,240,176,0.15);border:2px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1">✓</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent2)">SPARK</div>
+              <div style="font-size:9px;color:var(--text-dim)">Выполнено</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(74,240,176,0.15);border:2px solid var(--accent2);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1">✓</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent2)">CONSUMER</div>
+              <div style="font-size:9px;color:var(--text-dim)">Текущий уровень</div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;margin-bottom:16px;position:relative">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(240,196,74,0.1);border:2px solid var(--accent3);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1;animation:pulse 2s infinite">→</div>
+            <div style="flex:1">
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--accent3)">PROSUMER</div>
+              <div style="font-size:9px;color:var(--text-dim);margin-bottom:4px">Нужно: 15,000 $WATT · 500 репут.</div>
+              <div class="progress-track">
+                <div class="progress-fill" style="width:55%;background:linear-gradient(90deg,var(--accent3),var(--accent))"></div>
+              </div>
+            </div>
+          </div>
+
+          <div style="display:flex;align-items:center;gap:12px;position:relative;opacity:0.4">
+            <div style="width:32px;height:32px;border-radius:50%;background:rgba(90,122,153,0.1);border:2px solid var(--text-dim);display:flex;align-items:center;justify-content:center;font-size:12px;flex-shrink:0;z-index:1">🔒</div>
+            <div>
+              <div style="font-family:'Syne',sans-serif;font-size:12px;font-weight:700;color:var(--text-dim)">OPERATOR</div>
+              <div style="font-size:9px;color:var(--text-dim)">Заблокировано</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHOOSE OPERATOR -->
+      <div class="section-title">Сменить оператора</div>
+      <div class="consumers-card" style="margin-bottom:0">
+        <div class="consumer-item">
+          <div class="consumer-dot online"></div>
+          <div class="consumer-info">
+            <div class="consumer-name">LUMINOS_OP</div>
+            <div class="consumer-meta">Репут. 847 · Стаб. 85% · 12 потреб.</div>
+          </div>
+          <div style="font-size:10px;color:var(--accent2);font-family:'Syne',sans-serif;font-weight:700">✓ МОЙ</div>
+        </div>
+        <div class="consumer-item">
+          <div class="consumer-dot online"></div>
+          <div class="consumer-info">
+            <div class="consumer-name">GRIDMASTER</div>
+            <div class="consumer-meta">Репут. 923 · Стаб. 91% · 9 потреб.</div>
+          </div>
+          <div style="font-size:10px;color:var(--text-dim)">180₩/ч</div>
+        </div>
+        <div class="consumer-item">
+          <div class="consumer-dot danger"></div>
+          <div class="consumer-info">
+            <div class="consumer-name">CHEAPVOLT</div>
+            <div class="consumer-meta">Репут. 234 · Стаб. 58% · 22 потреб.</div>
+          </div>
+          <div style="font-size:10px;color:var(--danger)">80₩/ч</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="bottom-nav">
+      <div class="nav-item active">
+        <div class="nav-icon">⚡</div>
+        <div class="nav-label">Главная</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">🔌</div>
+        <div class="nav-label">Сеть</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">📈</div>
+        <div class="nav-label">Рынок</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">🏆</div>
+        <div class="nav-label">Рейтинг</div>
+      </div>
+      <div class="nav-item">
+        <div class="nav-icon">👤</div>
+        <div class="nav-label">Профиль</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>
