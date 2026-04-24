@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="uk">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LUMINA — GameFi Raid & Defense MVP</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            color: #e0e0e0;
+            overflow: hidden;
+        }
+
+        .container {
+            display: flex;
+            height: 100vh;
+            gap: 20px;
+            padding: 20px;
+        }
+
+        /* ЛЕВАЯ КОЛОНКА — ОСНОВНАЯ ИГРА */
+        .game-area {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 255, 136, 0.3);
+        }
+
+        .header h1 {
+            font-size: 24px;
+            color: #00ff88;
+            text-shadow: 0 0 10px #00ff88;
+        }
+
+        .header-stats {
+            display: flex;
+            gap: 30px;
+            font-size: 14px;
+        }
+
+        .stat {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .stat-label {
+            color: #888;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        .stat-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #00ff88;
+            margin-top: 5px;
+        }
+
+        /* ОСНОВНАЯ СЕТЬ */
+        .network-status {
+            padding: 20px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #0099ff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(0, 153, 255, 0.2);
+        }
+
+        .network-status h2 {
+            color: #0099ff;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .status-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+            margin-bottom: 15px;
+        }
+
+        .status-item {
+            padding: 12px;
+            background: rgba(0, 99, 153, 0.3);
+            border: 1px solid #0099ff;
+            border-radius: 4px;
+            text-align: center;
+        }
+
+        .status-item-label {
+            color: #888;
+            font-size: 11px;
+            text-transform: uppercase;
+            margin-bottom: 5px;
+        }
+
+        .status-item-value {
+            font-size: 16px;
+            color: #0099ff;
+            font-weight: bold;
+        }
+
+        /* ПРОГРЕСС БАРЫ */
+        .progress-bar {
+            width: 100%;
+            height: 20px;
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid #0099ff;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 10px;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #00ff88 0%, #0099ff 100%);
+            transition: width 0.3s ease;
+            box-shadow: 0 0 10px rgba(0, 153, 255, 0.5);
+        }
+
+        .progress-text {
+            position: absolute;
+            color: #fff;
+            font-size: 12px;
+            margin-top: -18px;
+            margin-left: 5px;
+        }
+
+        /* КОНСУМЕРЫ */
+        .consumers-section {
+            padding: 15px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #ff6600;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 102, 0, 0.2);
+        }
+
+        .consumers-section h3 {
+            color: #ff6600;
+            margin-bottom: 10px;
+            font-size: 14px;
+        }
+
+        .consumer-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 12px;
+            background: rgba(255, 102, 0, 0.1);
+            border-left: 3px solid #ff6600;
+            margin-bottom: 8px;
+            border-radius: 2px;
+            font-size: 12px;
+        }
+
+        .consumer-name {
+            color: #ffb366;
+        }
+
+        .consumer-load {
+            color: #ff6600;
+        }
+
+        /* ДЕЙСТВИЯ */
+        .actions-section {
+            padding: 20px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #ff00ff;
+            border-radius: 8px;
+            box-shadow: 0 0 20px rgba(255, 0, 255, 0.2);
+        }
+
+        .actions-section h2 {
+            color: #ff00ff;
+            margin-bottom: 15px;
+            font-size: 16px;
+        }
+
+        .action-buttons {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            padding: 12px 16px;
+            border: 2px solid #ff00ff;
+            background: rgba(255, 0, 255, 0.1);
+            color: #ff00ff;
+            border-radius: 4px;
+            cursor: pointer;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            text-transform: uppercase;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        button:hover {
+            background: rgba(255, 0, 255, 0.3);
+            box-shadow: 0 0 15px rgba(255, 0, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* ПРАВАЯ КОЛОНКА — ИНФО И ЛОГИ */
+        .info-panel {
+            width: 350px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .info-box {
+            padding: 15px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #888;
+            border-radius: 8px;
+            font-size: 12px;
+        }
+
+        .info-box h3 {
+            color: #888;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .info-content {
+            color: #aaa;
+            line-height: 1.6;
+        }
+
+        .event-log {
+            flex: 1;
+            padding: 15px;
+            background: rgba(13, 27, 51, 0.8);
+            border: 2px solid #00ff88;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+
+        .event-log h3 {
+            color: #00ff88;
+            margin-bottom: 10px;
+            text-transform: uppercase;
+            font-size: 11px;
+        }
+
+        .event-item {
+            padding: 8px;
+            margin-bottom: 8px;
+            background: rgba(0, 255, 136, 0.1);
+            border-left: 3px solid #00ff88;
+            border-radius: 2px;
+            font-size: 11px;
+            color: #aaa;
+        }
+
+        .event-item.warning {
+            background: rgba(255, 102, 0, 0.1);
+            border-left-color: #ff6600;
+            color: #ffb366;
+        }
+
+        .event-item.danger {
+            background: rgba(255, 0, 0, 0.1);
+            border-left-color: #ff0000;
+            color: #ff6666;
+        }
+
+        .event-item.success {
+            background: rgba(0, 255, 136, 0.1);
+            border-left-color: #00ff88;
+            color: #88ffbb;
+        }
+
+        .event-item.timestamp {
+            color: #666;
+            font-size: 10px;
+        }
+
+        /* МОДАЛЬНОЕ ОКНО */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 1000;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal.active {
+            display: flex;
+        }
+
+        .modal-content {
+            padding: 30px;
+            background: linear-gradient(135deg, #0a0e27 0%, #1a1f3a 100%);
+            border: 3px solid #ff00ff;
+            border-radius: 8px;
+            max-width: 500px;
+            box-shadow: 0 0 40px rgba(255, 0, 255, 0.5);
+        }
+
+        .modal-content h2 {
+            color: #ff00ff;
+            margin-bottom: 20px;
+            font-size: 18px;
+        }
+
+        .modal-content p {
+            color: #aaa;
+            margin-bottom: 15px;
+            line-height: 1.6;
+        }
+
+        .modal-input {
+            width: 100%;
+            padding: 10px;
+            margin-bottom: 15px;
+            background: rgba(255, 0, 255, 0.1);
+            border: 1px solid #ff00ff;
+            color: #ff00ff;
+            border-radius: 4px;
+            font-family: 'Courier New', monospace;
+        }
+
+        .modal-buttons {
+            display: flex;
+            gap: 10px;
+        }
+
+        .modal-buttons button {
+            flex: 1;
+        }
+
+        .modal-buttons .cancel-btn {
+            border-color: #888;
+            color: #888;
+            background: rgba(136, 136, 136, 0.1);
+        }
+
+        .modal-buttons .cancel-btn:hover {
+            background: rgba(136, 136, 136, 0.2);
+            box-shadow: 0 0 15px rgba(136, 136, 136, 0.3);
+        }
+
+        /* ВРЕМЯ В РЕАЛЬНОМ ВРЕМЕНИ */
+        .time-display {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+            font-size: 12px;
+            margin-bottom: 10px;
+        }
+
+        .time-label {
+            color: #888;
+        }
+
+        .time-value {
+            color: #00ff88;
+            font-weight: bold;
+            font-size: 14px;
+        }
+
+        /* СКРОЛЛ */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 136, 0.3);
+            border-radius: 4px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: rgba(0, 255, 136, 0.5);
+        }
+
+        /* АДАПТИВ */
+        @media (max-width: 1400px) {
+            .container {
+                flex-direction: column;
+            }
+
+            .info-panel {
+                width: 100%;
+                max-height: 300px;
+            }
+        }
+
+        .warning-text {
+            color: #ff6600;
+        }
+
+        .success-text {
+            color: #00ff88;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- ОСНОВНАЯ ИГРА -->
+        <div class="game-area">
+            <!-- ХІДЕР -->
+            <div class="header">
+                <h1>⚡ LUMINA OPERATOR DASHBOARD</h1>
+                <div class="header-stats">
+                    <div class="stat">
+                        <span class="stat-label">Ваше ім'я</span>
+                        <span class="stat-value" id="playerName">Оператор #001</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">Репутація</span>
+                        <span class="stat-value" id="reputation">850</span>
+                    </div>
+                    <div class="stat">
+                        <span class="stat-label">День входу</span>
+                        <span class="stat-value" id="streak">7</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- СТАТУС МЕРЕЖІ -->
+            <div class="network-status">
+                <h2>📊 Статус вашої мережі</h2>
+                
+                <div class="status-grid">
+                    <div class="status-item">
+                        <div class="status-item-label">Стабільність</div>
+                        <div class="status-item-value" id="stability">85%</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-item-label">Поточна нагрузка</div>
+                        <div class="status-item-value" id="currentLoad">42/100 MW</div>
+                    </div>
+                    <div class="status-item">
+                        <div class="status-item-label">Баланс $WATT</div>
+                        <div class="status-item-value" id="wattBalance">5,240</div>
+                    </div>
+                </div>
+
+                <div style="margin-bottom: 15px;">
+                    <strong style="color: #0099ff;">Стабільність мережі:</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="stabilityBar" style="width: 85%; background: linear-gradient(90deg, #00ff88 0%, #0099ff 100%);"></div>
+                    </div>
+                </div>
+
+                <div>
+                    <strong style="color: #0099ff;">Використання ємності:</strong>
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="capacityBar" style="width: 42%; background: linear-gradient(90deg, #0099ff 0%, #ff6600 100%);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- КОНСУМЕРИ -->
+            <div class="consumers-section">
+                <h3>👥 Ваші споживачі</h3>
+                <div id="consumersList"></div>
+            </div>
+
+            <!-- ДІЇ -->
+            <div class="actions-section">
+                <h2>⚔️ Доступні дії</h2>
+                <div class="action-buttons">
+                    <button onclick="openRaidModal()">🔥 Рейд (SURGE)</button>
+                    <button onclick="openDefenseModal()">🛡️ Захист мережі</button>
+                    <button onclick="craftEquipment()">🔧 Крафт обладнання</button>
+                    <button onclick="collectRewards()">💎 Зібрати винагороду</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- ІНФОРМАЦІЙНА ПАНЕЛЬ -->
+        <div class="info-panel">
+            <!-- ЧАС -->
+            <div class="time-display">
+                <span class="time-label">Час гри</span>
+                <span class="time-value" id="gameTime">14:35:42</span>
+            </div>
+
+            <!-- ІНФОРМАЦІЯ ПРО ГРУ -->
+            <div class="info-box">
+                <h3>ℹ️ Як грати</h3>
+                <div class="info-content">
+                    <p>1. Управляйте своєю мережею - тримайте стабільність вище 50%</p>
+                    <p>2. Залучайте споживачів - вони принесуть $WATT</p>
+                    <p>3. Атакуйте противників або захищайтесь від рейдів</p>
+                    <p>4. Збирайте винагороди щодня (Grid Online)</p>
+                    <p>5. Вступайте в альянси для колективної гри</p>
+                </div>
+            </div>
+
+            <!-- КВЕСТ ДНЯ -->
+            <div class="info-box">
+                <h3>📋 Квест дня</h3>
+                <div class="info-content">
+                    <p><strong>Балансування навантаження</strong></p>
+                    <p>Утримуйте стабільність понад 80% протягом 10 хвилин</p>
+                    <p><strong class="success-text">Винагорода:</strong> 800 $WATT</p>
+                    <p><strong id="questStatus">Прогрес:</strong> 4/10 хвилин</p>
+                    <div class="progress-bar" style="margin-top: 8px;">
+                        <div class="progress-fill" id="questBar" style="width: 40%; background: linear-gradient(90deg, #ff00ff 0%, #00ff88 100%);"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ЛОГ ПОДІЙ -->
+            <div class="event-log">
+                <h3>📡 Лог подій</h3>
+                <div id="eventLog"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО РЕЙДУ -->
+    <div class="modal" id="raidModal">
+        <div class="modal-content">
+            <h2>🔥 Запустити рейд SURGE</h2>
+            <p>Виберіть ціль для атаки:</p>
+            <select class="modal-input" id="targetSelect">
+                <option value="">-- Виберіть мережу противника --</option>
+                <option value="nexus">NEXUS Corp (Ємність: 150 MW)</option>
+                <option value="volt">VOLT Energy (Ємність: 200 MW)</option>
+                <option value="phoenix">PHOENIX Grid (Ємність: 120 MW)</option>
+            </select>
+            <p id="raidCost"></p>
+            <p id="raidSuccess"></p>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeRaidModal()">Скасувати</button>
+                <button onclick="executeRaid()">Атакувати!</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- МОДАЛЬНЕ ВІКНО ЗАХИСТУ -->
+    <div class="modal" id="defenseModal">
+        <div class="modal-content">
+            <h2>🛡️ Посилення захисту</h2>
+            <p>Виберіть тип захисту:</p>
+            <div style="margin-bottom: 15px;">
+                <label>
+                    <input type="radio" name="defense" value="surge" checked> Предохранитель від SURGE (200 $WATT)
+                </label>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>
+                    <input type="radio" name="defense" value="blackout"> Резервна лінія від BLACKOUT (1500 $WATT)
+                </label>
+            </div>
+            <div style="margin-bottom: 15px;">
+                <label>
+                    <input type="radio" name="defense" value="interference"> Екранування від INTERFERENCE (3000 $WATT)
+                </label>
+            </div>
+            <div class="modal-buttons">
+                <button class="cancel-btn" onclick="closeDefenseModal()">Скасувати</button>
+                <button onclick="buyDefense()">Купити захист</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ========== ІНІЦІАЛІЗАЦІЯ ГРИ ==========
+        const gameState = {
+            playerName: 'Оператор #001',
+            reputation: 850,
+            streak: 7,
+            stability: 85,
+            currentLoad: 42,
+            maxCapacity: 100,
+            wattBalance: 5240,
+            lumina: 125,
+            consumers: [
+                { id: 1, name: 'ТОВ "Промисловість"', load: 15, fee: 12.5 },
+                { id: 2, name: 'Лікарня №5', load: 12, fee: 10.0 },
+                { id: 3, name: 'ТЦ "Центр"', load: 8, fee: 6.7 },
+                { id: 4, name: 'Офіс StartUp', load: 7, fee: 5.8 }
+            ],
+            defenses: {
+                surge: 0,
+                blackout: 0,
+                interference: 0
+            },
+            questProgress: 4,
+            questTarget: 10
+        };
+
+        const events = [];
+
+        // ========== ОСНОВНИЙ ІГРОВОЙ ЦИКЛ ==========
+        setInterval(() => {
+            // Генерування $WATT (пасивний доход)
+            gameState.wattBalance += 2;
+            
+            // Варіативність стабільності
+            if (Math.random() < 0.1) {
+                gameState.stability += (Math.random() - 0.5) * 5;
+                gameState.stability = Math.max(10, Math.min(100, gameState.stability));
+            }
+
+            // Прогрес квесту
+            if (gameState.stability > 80 && gameState.questProgress < gameState.questTarget) {
+                gameState.questProgress += 0.1;
+            }
+
+            updateUI();
+        }, 1000);
+
+        // ========== ОНОВЛЕННЯ ІНТЕРФЕЙСУ ==========
+        function updateUI() {
+            // Основні статистики
+            document.getElementById('playerName').textContent = gameState.playerName;
+            document.getElementById('reputation').textContent = gameState.reputation;
+            document.getElementById('streak').textContent = gameState.streak;
+            
+            // Статус мережі
+            document.getElementById('stability').textContent = Math.round(gameState.stability) + '%';
+            document.getElementById('currentLoad').textContent = Math.round(gameState.currentLoad) + '/' + gameState.maxCapacity + ' MW';
+            document.getElementById('wattBalance').textContent = Math.round(gameState.wattBalance).toLocaleString();
+            
+            // Прогресс бари
+            document.getElementById('stabilityBar').style.width = gameState.stability + '%';
+            document.getElementById('capacityBar').style.width = (gameState.currentLoad / gameState.maxCapacity * 100) + '%';
+            
+            // Квест
+            const questPercent = (gameState.questProgress / gameState.questTarget) * 100;
+            document.getElementById('questStatus').textContent = `Прогрес: ${Math.round(gameState.questProgress)}/${gameState.questTarget} хвилин`;
+            document.getElementById('questBar').style.width = Math.min(100, questPercent) + '%';
+            
+            // Список споживачів
+            updateConsumersList();
+            
+            // Час
+            updateTime();
+            
+            // Лог подій
+            updateEventLog();
+        }
+
+        function updateConsumersList() {
+            const list = document.getElementById('consumersList');
+            list.innerHTML = gameState.consumers.map(c => `
+                <div class="consumer-item">
+                    <span class="consumer-name">${c.name}</span>
+                    <span class="consumer-load">${c.load} MW | ${c.fee} $WATT/ч</span>
+                </div>
+            `).join('');
+        }
+
+        function updateTime() {
+            const now = new Date();
+            const hours = String(now.getHours()).padStart(2, '0');
+            const minutes = String(now.getMinutes()).padStart(2, '0');
+            const seconds = String(now.getSeconds()).padStart(2, '0');
+            document.getElementById('gameTime').textContent = `${hours}:${minutes}:${seconds}`;
+        }
+
+        function updateEventLog() {
+            const log = document.getElementById('eventLog');
+            const lastEvents = events.slice(-8).reverse();
+            log.innerHTML = lastEvents.map(e => `
+                <div class="event-item ${e.type}">
+                    <div class="timestamp">[${e.time}]</div>
+                    <div>${e.message}</div>
+                </div>
+            `).join('');
+        }
+
+        function addEvent(message, type = 'info') {
+            const now = new Date();
+            const time = String(now.getHours()).padStart(2, '0') + ':' + 
+                        String(now.getMinutes()).padStart(2, '0');
+            events.push({ message, type, time });
+            if (events.length > 50) events.shift();
+        }
+
+        // ========== РЕЙД СИСТЕМА ==========
+        function openRaidModal() {
+            if (gameState.wattBalance < 15) {
+                addEvent('❌ Недостатньо $WATT для рейду', 'danger');
+                return;
+            }
+            document.getElementById('raidModal').classList.add('active');
+            updateRaidInfo();
+        }
+
+        function closeRaidModal() {
+            document.getElementById('raidModal').classList.remove('active');
+        }
+
+        function updateRaidInfo() {
+            const target = document.getElementById('targetSelect').value;
+            const targets = {
+                nexus: { capacity: 150, defense: 60 },
+                volt: { capacity: 200, defense: 80 },
+                phoenix: { capacity: 120, defense: 50 }
+            };
+            
+            if (target && targets[target]) {
+                const t = targets[target];
+                const cost = Math.round(t.capacity * 0.15);
+                const successChance = Math.round((80 / (80 + t.defense)) * 100);
+                
+                document.getElementById('raidCost').innerHTML = 
+                    `<strong>Вартість атаки:</strong> <span class="warning-text">${cost} $WATT</span>`;
+                document.getElementById('raidSuccess').innerHTML = 
+                    `<strong>Шанс успіху:</strong> <span class="success-text">${successChance}%</span>`;
+            }
+        }
+
+        document.getElementById('targetSelect').addEventListener('change', updateRaidInfo);
+
+        function executeRaid() {
+            const target = document.getElementById('targetSelect').value;
+            if (!target) {
+                addEvent('❌ Виберіть ціль', 'danger');
+                return;
+            }
+
+            const targets = {
+                nexus: { capacity: 150, defense: 60, name: 'NEXUS Corp' },
+                volt: { capacity: 200, defense: 80, name: 'VOLT Energy' },
+                phoenix: { capacity: 120, defense: 50, name: 'PHOENIX Grid' }
+            };
+
+            const t = targets[target];
+            const cost = Math.round(t.capacity * 0.15);
+            const successChance = (80 / (80 + t.defense));
+
+            if (gameState.wattBalance < cost) {
+                addEvent('❌ Недостатньо $WATT', 'danger');
+                closeRaidModal();
+                return;
+            }
+
+            const success = Math.random() < successChance;
+            gameState.wattBalance -= cost;
+
+            if (success) {
+                const reward = Math.round(cost * 1.5);
+                gameState.wattBalance += reward;
+                gameState.reputation -= 10;
+                addEvent(`✅ Успішна атака на ${t.name}! Отримано ${reward} $WATT`, 'success');
+            } else {
+                gameState.reputation -= 25;
+                addEvent(`❌ Атака на ${t.name} провалена. Репутація -25`, 'danger');
+            }
+
+            closeRaidModal();
+            updateUI();
+        }
+
+        // ========== ЗАХИСТ ==========
+        function openDefenseModal() {
+            document.getElementById('defenseModal').classList.add('active');
+        }
+
+        function closeDefenseModal() {
+            document.getElementById('defenseModal').classList.remove('active');
+        }
+
+        function buyDefense() {
+            const type = document.querySelector('input[name="defense"]:checked').value;
+            const costs = {
+                surge: 200,
+                blackout: 1500,
+                interference: 3000
+            };
+            const names = {
+                surge: 'Предохранитель',
+                blackout: 'Резервна лінія',
+                interference: 'Екранування'
+            };
+
+            const cost = costs[type];
+
+            if (gameState.wattBalance < cost) {
+                addEvent(`❌ Недостатньо $WATT для ${names[type]}`, 'danger');
+                return;
+            }
+
+            gameState.wattBalance -= cost;
+            gameState.defenses[type]++;
+            gameState.stability += 5;
+            gameState.stability = Math.min(100, gameState.stability);
+
+            addEvent(`✅ Придбано ${names[type]} (+1 шт)`, 'success');
+            closeDefenseModal();
+            updateUI();
+        }
+
+        // ========== КРАФТ ==========
+        function craftEquipment() {
+            const cost = 300;
+            if (gameState.wattBalance < cost) {
+                addEvent('❌ Недостатньо $WATT для крафту', 'danger');
+                return;
+            }
+
+            gameState.wattBalance -= cost;
+            const success = Math.random() < 0.7;
+
+            if (success) {
+                gameState.lumina += 5;
+                addEvent('✅ Успішний крафт! +5 $LUMINA', 'success');
+            } else {
+                addEvent('❌ Крафт провалився. Ресурси втрачені', 'warning');
+            }
+
+            updateUI();
+        }
+
+        // ========== ЗБІР ВИНАГОРОД ==========
+        function collectRewards() {
+            const reward = Math.round(gameState.consumers.reduce((sum, c) => sum + c.fee, 0));
+            gameState.wattBalance += reward;
+            gameState.reputation += 5;
+            gameState.streak += 0.5;
+
+            addEvent(`💎 Зібрано винагради: +${reward} $WATT`, 'success');
+            updateUI();
+        }
+
+        // ========== ІНІЦІАЛІЗАЦІЯ ==========
+        addEvent('⚡ Добро пожалуйте до LUMINA', 'info');
+        addEvent('📊 Ваша мережа активна', 'success');
+        addEvent('👥 4 споживачів підключено', 'info');
+        updateUI();
+    </script>
+</body>
+</html>
